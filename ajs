@@ -60,10 +60,11 @@ fi
 
 if [ ! -z "$get" ]; then
   secrets=$(aws secretsmanager get-secret-value \
-    --profile ${profile} --secret-id ${secret});
+    --profile ${profile} --secret-id ${secret})
   if [ "$?" -eq 0 ]; then
-    printf "${secrets}" | jq -r .SecretString | jq > ${secret}.json
-    printf "\n\tSecrets manager => ${secret}.json\n"
+    echo "${secrets}" | jq -r .SecretString | jq
+    echo "${secrets}" | jq -r .SecretString | jq > ${secret}.json
+    printf "\n\tFetched secret from AWS Secrets Manager to ${secret}.json\n"
     exit 0
   else
     exit 1
@@ -80,7 +81,7 @@ if [ ! -z "$put" ]; then
     --secret-id ${secret} \
     --secret-string $(jq -cM < ${secret}.json)
   if [ "$?" -eq 0 ]; then
-    echo "\n\t${secret}.json => Secrets manager\n"
+    echo "\n\tPushed secret from ${secret}.json to AWS Secrets Manager\n"
     exit 0
   else
     exit 1
